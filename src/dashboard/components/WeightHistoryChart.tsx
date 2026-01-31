@@ -20,16 +20,6 @@ const dayOffsets: Record<WeekDayKey, number> = {
   sun: 6,
 };
 
-const dayLabels: Record<WeekDayKey, string> = {
-  mon: "Mon",
-  tue: "Tue",
-  wed: "Wed",
-  thu: "Thu",
-  fri: "Fri",
-  sat: "Sat",
-  sun: "Sun",
-};
-
 function getWeightSeries(weeks: FitnessWeek[]) {
   const labels: string[] = [];
   const weights: Array<number | null> = [];
@@ -43,11 +33,11 @@ function getWeightSeries(weeks: FitnessWeek[]) {
       }
       const dayDate = new Date(weekStart);
       dayDate.setDate(dayDate.getDate() + dayOffsets[dayKey]);
-      const dateLabel = dayDate.toLocaleDateString("en-US", {
+      const dateLabel = dayDate.toLocaleDateString("en-DE", {
         month: "short",
         day: "numeric",
       });
-      labels.push(`${dateLabel} ${dayLabels[dayKey]}`);
+      labels.push(`${dateLabel}`);
       weights.push(typeof day.weightKg === "number" ? day.weightKg : null);
     });
   });
@@ -102,7 +92,7 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
             }}
           >
             <Typography variant="h4" component="p">
-              {latestWeight !== null ? latestWeight.toFixed(1) : "--"}
+              {latestWeight !== null ? latestWeight.toFixed(1) + " kg" : "--"}
             </Typography>
             {changePercent !== null && (
               <Chip
@@ -161,12 +151,12 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
           <linearGradient id="weight" x1="0%" y1="100%" x2="0%" y2="0%">
             <stop
               offset="0%"
-              stopOpacity={0}
+              stopOpacity={0.1}
               stopColor={theme.palette.primary.main}
             />
             <stop
               offset="100%"
-              stopOpacity={0.8}
+              stopOpacity={0.7}
               stopColor={theme.palette.primary.main}
             />
           </linearGradient>
