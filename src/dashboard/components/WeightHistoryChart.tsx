@@ -5,6 +5,7 @@ import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
+import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
 
 function AreaGradient({ color, id }: { color: string; id: string }) {
   return (
@@ -17,24 +18,72 @@ function AreaGradient({ color, id }: { color: string; id: string }) {
   );
 }
 
-function getDaysInMonth(month: number, year: number) {
-  const date = new Date(year, month, 0);
-  const monthName = date.toLocaleDateString("en-US", {
-    month: "short",
+const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+const dayOffsets: Record<WeekDayKey, number> = {
+  mon: 0,
+  tue: 1,
+  wed: 2,
+  thu: 3,
+  fri: 4,
+  sat: 5,
+  sun: 6,
+};
+
+const dayLabels: Record<WeekDayKey, string> = {
+  mon: "Mon",
+  tue: "Tue",
+  wed: "Wed",
+  thu: "Thu",
+  fri: "Fri",
+  sat: "Sat",
+  sun: "Sun",
+};
+
+function getWeightSeries(weeks: FitnessWeek[]) {
+  const labels: string[] = [];
+  const weights: Array<number | null> = [];
+
+  weeks.forEach((week) => {
+    const weekStart = new Date(`${week.weekOf}T00:00:00`);
+    dayKeys.forEach((dayKey) => {
+      const day = week.days?.[dayKey];
+      if (!day) {
+        return;
+      }
+      const dayDate = new Date(weekStart);
+      dayDate.setDate(dayDate.getDate() + dayOffsets[dayKey]);
+      const dateLabel = dayDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      labels.push(`${dateLabel} ${dayLabels[dayKey]}`);
+      weights.push(typeof day.weightKg === "number" ? day.weightKg : null);
+    });
   });
-  const daysInMonth = date.getDate();
-  const days = [];
-  let i = 1;
-  while (days.length < daysInMonth) {
-    days.push(`${monthName} ${i}`);
-    i += 1;
-  }
-  return days;
+
+  return { labels, weights };
 }
 
-export default function WeightHistoryChart() {
+type WeightHistoryChartProps = {
+  weeks: FitnessWeek[];
+};
+
+export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
   const theme = useTheme();
-  const data = getDaysInMonth(1, 2026);
+  const { labels, weights } = getWeightSeries(weeks);
+  const definedWeights = weights.filter(
+    (value): value is number => typeof value === "number",
+  );
+  const latestWeight =
+    definedWeights.length > 0
+      ? definedWeights[definedWeights.length - 1]
+      : null;
+  const firstWeight = definedWeights.length > 0 ? definedWeights[0] : null;
+  const changePercent =
+    latestWeight !== null && firstWeight
+      ? ((latestWeight - firstWeight) / firstWeight) * 100
+      : null;
 
   const colorPalette = [
     theme.palette.primary.light,
@@ -58,9 +107,17 @@ export default function WeightHistoryChart() {
             }}
           >
             <Typography variant="h4" component="p">
-              13,277
+              {latestWeight !== null ? latestWeight.toFixed(1) : "--"}
             </Typography>
-            <Chip size="small" color="success" label="+35%" />
+            {changePercent !== null && (
+              <Chip
+                size="small"
+                color={changePercent <= 0 ? "success" : "error"}
+                label={`${changePercent > 0 ? "+" : ""}${changePercent.toFixed(
+                  1,
+                )}%`}
+              />
+            )}
           </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             Daily Weight in kg
@@ -71,12 +128,18 @@ export default function WeightHistoryChart() {
           xAxis={[
             {
               scaleType: "point",
-              data,
+              data: labels,
               tickInterval: (_index, i) => (i + 1) % 5 === 0,
               height: 24,
             },
           ]}
-          yAxis={[{ width: 50 }]}
+          yAxis={[
+            {
+              width: 50,
+              min: Math.min(...definedWeights) - 5,
+              max: Math.max(...definedWeights) + 5,
+            },
+          ]}
           series={[
             {
               id: "weight",
@@ -84,11 +147,7 @@ export default function WeightHistoryChart() {
               showMark: false,
               curve: "linear",
               area: true,
-              data: [
-                300, 900, 600, 1200, 1500, 1800, 2400, 2100, 2700, 3000, 1800,
-                3300, 3600, 3900, 4200, 4500, 3900, 4800, 5100, 5400, 4800,
-                5700, 6000, 6300, 6600, 6900, 7200, 7500, 7800, 8100,
-              ],
+              data: weights,
             },
           ]}
           height={250}
