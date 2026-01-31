@@ -5,18 +5,8 @@ import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
-import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
 
-function AreaGradient({ color, id }: { color: string; id: string }) {
-  return (
-    <defs>
-      <linearGradient id={id} x1="50%" y1="0%" x2="50%" y2="100%">
-        <stop offset="0%" stopColor={color} stopOpacity={0.5} />
-        <stop offset="100%" stopColor={color} stopOpacity={0} />
-      </linearGradient>
-    </defs>
-  );
-}
+import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
 
 const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -91,6 +81,11 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
     theme.palette.primary.dark,
   ];
 
+  const yAxisMin =
+    definedWeights.length > 0 ? Math.min(...definedWeights) - 5 : undefined;
+  const yAxisMax =
+    definedWeights.length > 0 ? Math.max(...definedWeights) + 5 : undefined;
+
   return (
     <Card variant="outlined" sx={{ width: "100%" }}>
       <CardContent>
@@ -136,8 +131,8 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
           yAxis={[
             {
               width: 50,
-              min: Math.min(...definedWeights) - 5,
-              max: Math.max(...definedWeights) + 5,
+              min: yAxisMin,
+              max: yAxisMax,
             },
           ]}
           series={[
@@ -147,7 +142,9 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
               showMark: false,
               curve: "linear",
               area: true,
+              baseline: yAxisMin,
               data: weights,
+              connectNulls: true,
             },
           ]}
           height={250}
@@ -156,11 +153,23 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
           sx={{
             "& .MuiAreaElement-series-weight": {
               fill: "url('#weight')",
+              fillOpacity: 1,
             },
           }}
           hideLegend
         >
-          <AreaGradient color={theme.palette.primary.dark} id="weight" />
+          <linearGradient id="weight" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop
+              offset="0%"
+              stopOpacity={0}
+              stopColor={theme.palette.primary.main}
+            />
+            <stop
+              offset="100%"
+              stopOpacity={0.8}
+              stopColor={theme.palette.primary.main}
+            />
+          </linearGradient>
         </LineChart>
       </CardContent>
     </Card>
