@@ -20,29 +20,64 @@ const dayOffsets: Record<WeekDayKey, number> = {
   sun: 6,
 };
 
+function getAvgWeightForWeek(week: FitnessWeek): number | null {
+  const dayWeights: number[] = [];
+  dayKeys.forEach((dayKey) => {
+    const day = week.days?.[dayKey];
+    if (day && typeof day.weightKg === "number") {
+      dayWeights.push(day.weightKg);
+    }
+  });
+  if (dayWeights.length === 0) {
+    return null;
+  }
+  const total = dayWeights.reduce((sum, weight) => sum + weight, 0);
+  return total / dayWeights.length;
+}
+
+function getLastLoggedDayKey(week: FitnessWeek): WeekDayKey | null {
+  for (let i = dayKeys.length - 1; i >= 0; i -= 1) {
+    const dayKey = dayKeys[i];
+    const day = week.days?.[dayKey];
+    if (day && typeof day.weightKg === "number") {
+      return dayKey;
+    }
+  }
+  return null;
+}
+
 function getWeightSeries(weeks: FitnessWeek[]) {
   const labels: string[] = [];
   const weights: Array<number | null> = [];
+  const avgWeights: Array<number | null> = [];
 
-  weeks.forEach((week) => {
+  weeks.forEach((week, weekIndex) => {
     const weekStart = new Date(`${week.weekOf}T00:00:00`);
+    const weekAvg = getAvgWeightForWeek(week);
+    const isLastWeek = weekIndex === weeks.length - 1;
+    const lastLoggedDayKey = isLastWeek ? getLastLoggedDayKey(week) : null;
+    const avgDayKey = isLastWeek ? lastLoggedDayKey : "mon";
+
     dayKeys.forEach((dayKey) => {
-      const day = week.days?.[dayKey];
-      if (!day) {
-        return;
-      }
       const dayDate = new Date(weekStart);
       dayDate.setDate(dayDate.getDate() + dayOffsets[dayKey]);
       const dateLabel = dayDate.toLocaleDateString("en-DE", {
         month: "short",
         day: "numeric",
       });
+
       labels.push(`${dateLabel}`);
-      weights.push(typeof day.weightKg === "number" ? day.weightKg : null);
+
+      const day = week.days?.[dayKey];
+      weights.push(typeof day?.weightKg === "number" ? day.weightKg : null);
+
+      avgWeights.push(
+        weekAvg !== null && avgDayKey === dayKey ? weekAvg : null,
+      );
     });
   });
 
-  return { labels, weights };
+  return { labels, weights, avgWeights };
 }
 
 type WeightHistoryChartProps = {
@@ -51,7 +86,7 @@ type WeightHistoryChartProps = {
 
 export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
   const theme = useTheme();
-  const { labels, weights } = getWeightSeries(weeks);
+  const { labels, weights, avgWeights } = getWeightSeries(weeks);
   const definedWeights = weights.filter(
     (value): value is number => typeof value === "number",
   );
@@ -136,6 +171,16 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
               data: weights,
               connectNulls: true,
             },
+            {
+              id: "avgWeight",
+              label: "Avg Weight",
+              showMark: false,
+              curve: "monotoneX",
+              data: avgWeights,
+              connectNulls: true,
+              baseline: yAxisMin,
+              color: theme.palette.secondary.main,
+            },
           ]}
           height={250}
           margin={{ left: 0, right: 20, top: 20, bottom: 0 }}
@@ -144,6 +189,9 @@ export default function WeightHistoryChart({ weeks }: WeightHistoryChartProps) {
             "& .MuiAreaElement-series-weight": {
               fill: "url('#weight')",
               fillOpacity: 1,
+            },
+            "& .MuiLineElement-series-avgWeight": {
+              strokeDasharray: "5 5",
             },
           }}
           hideLegend
