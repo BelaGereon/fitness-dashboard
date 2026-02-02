@@ -1,13 +1,19 @@
 import { useMemo } from "react";
 import Dashboard from "./dashboard/Dashboard";
-import { StorageAdapterProvider, createWebStorageAdapter } from "./storage";
+import {
+  StorageAdapterProvider,
+  createNoopAdapter,
+  createWebStorageAdapter,
+} from "./storage";
 import AppTheme from "./shared-theme/AppTheme";
 
 export default function App() {
-  const adapter = useMemo(
-    () => createWebStorageAdapter(window.localStorage),
-    [],
-  );
+  const adapter = useMemo(() => {
+    if (typeof window === "undefined") {
+      return createNoopAdapter();
+    }
+    return createWebStorageAdapter(window.localStorage);
+  }, []);
 
   return (
     <AppTheme>

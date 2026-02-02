@@ -1,4 +1,4 @@
-export { createWebStorageAdapter } from "./adapters";
+export { createNoopAdapter, createWebStorageAdapter } from "./adapters";
 export { createStorageLayer } from "./storageLayer";
 export {
   StorageAdapterProvider,

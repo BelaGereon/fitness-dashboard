@@ -7,3 +7,11 @@ export function createWebStorageAdapter(storage: Storage): StorageAdapter {
     removeItem: (key) => storage.removeItem(key),
   };
 }
+
+export function createNoopAdapter(): StorageAdapter {
+  return {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+  };
+}
