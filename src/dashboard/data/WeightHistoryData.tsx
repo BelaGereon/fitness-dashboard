@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
+import { useFitnessWeeks } from "./FitnessWeeksData";
 
 const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -25,15 +26,6 @@ type WeightHistorySummary = {
   latestWeight: number | null;
   changePercent: number | null;
 };
-
-type WeightHistoryContextValue = {
-  series: WeightHistorySeries;
-  summary: WeightHistorySummary;
-};
-
-const WeightHistoryContext = createContext<WeightHistoryContextValue | null>(
-  null,
-);
 
 function getAvgWeightForWeek(week: FitnessWeek): number | null {
   const dayWeights: number[] = [];
@@ -120,42 +112,17 @@ function buildSummary(weights: Array<number | null>): WeightHistorySummary {
   return { latestWeight, changePercent };
 }
 
-type WeightHistoryDataProviderProps = {
-  weeks: FitnessWeek[];
-  children: ReactNode;
-};
-
-export function WeightHistoryDataProvider({
-  weeks,
-  children,
-}: WeightHistoryDataProviderProps) {
-  const value = useMemo<WeightHistoryContextValue>(() => {
-    const series = buildSeries(weeks);
-    const summary = buildSummary(series.weights);
-    return { series, summary };
-  }, [weeks]);
-
-  return (
-    <WeightHistoryContext.Provider value={value}>
-      {children}
-    </WeightHistoryContext.Provider>
-  );
-}
-
-function useWeightHistoryContext() {
-  const context = useContext(WeightHistoryContext);
-  if (!context) {
-    throw new Error(
-      "useWeightHistoryContext must be used within WeightHistoryDataProvider",
-    );
-  }
-  return context;
+export function useWeightHistoryData() {
+  const weeks = useFitnessWeeks();
+  const series = useMemo(() => buildSeries(weeks), [weeks]);
+  const summary = useMemo(() => buildSummary(series.weights), [series]);
+  return { series, summary };
 }
 
 export function useWeightHistorySeries() {
-  return useWeightHistoryContext().series;
+  return useWeightHistoryData().series;
 }
 
 export function useWeightHistorySummary() {
-  return useWeightHistoryContext().summary;
+  return useWeightHistoryData().summary;
 }

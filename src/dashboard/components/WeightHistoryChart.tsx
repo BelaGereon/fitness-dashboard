@@ -6,16 +6,13 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
 
-import {
-  useWeightHistorySeries,
-  useWeightHistorySummary,
-} from "../data/WeightHistoryData";
+import { useWeightHistoryData } from "../data/WeightHistoryData";
 
 export default function WeightHistoryChart() {
   const theme = useTheme();
-  const { labels, weights, avgWeights, yAxisMin, yAxisMax } =
-    useWeightHistorySeries();
-  const { latestWeight, changePercent } = useWeightHistorySummary();
+  const { series, summary } = useWeightHistoryData();
+  const { labels, weights, avgWeights, yAxisMin, yAxisMax } = series;
+  const { latestWeight, changePercent } = summary;
 
   const colorPalette = [
     theme.palette.primary.light,

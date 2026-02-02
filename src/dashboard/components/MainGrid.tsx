@@ -11,7 +11,7 @@ import PageViewsBarChart from "./PageViewsBarChart";
 import WeightHistoryChart from "./WeightHistoryChart";
 import StatCard, { StatCardProps } from "./StatCard";
 import { weightHistoryWeeks } from "../data/weightHistoryWeeks";
-import { WeightHistoryDataProvider } from "../data/WeightHistoryData";
+import { FitnessWeeksDataProvider } from "../data/FitnessWeeksData";
 
 const data: StatCardProps[] = [
   {
@@ -69,9 +69,9 @@ export default function MainGrid() {
           <HighlightedCard />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
-          <WeightHistoryDataProvider weeks={weightHistoryWeeks}>
+          <FitnessWeeksDataProvider weeks={weightHistoryWeeks}>
             <WeightHistoryChart />
-          </WeightHistoryDataProvider>
+          </FitnessWeeksDataProvider>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <PageViewsBarChart />
