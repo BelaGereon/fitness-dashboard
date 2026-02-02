@@ -105,20 +105,18 @@ export default function WeightHistoryChart() {
           }}
           hideLegend
         >
-          <linearGradient id="weight" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop
-              offset="0%"
-              stopOpacity={0.1}
-              stopColor={theme.palette.primary.main}
-            />
-            <stop
-              offset="100%"
-              stopOpacity={0.7}
-              stopColor={theme.palette.primary.main}
-            />
-          </linearGradient>
+          <VerticalGradient id="weight" color={theme.palette.primary.main} />
         </LineChart>
       </CardContent>
     </Card>
+  );
+}
+
+function VerticalGradient({ id, color }: { id: string; color: string }) {
+  return (
+    <linearGradient id={id} x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stopOpacity={0.1} stopColor={color} />
+      <stop offset="100%" stopOpacity={0.7} stopColor={color} />
+    </linearGradient>
   );
 }
