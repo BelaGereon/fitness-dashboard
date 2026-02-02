@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
 
-import { useWeightHistoryData } from "../data/WeightHistoryData";
+import { useWeightHistoryData } from "../data/hooks/dataHooks";
 
 export default function WeightHistoryChart() {
   const theme = useTheme();
