@@ -1,4 +1,4 @@
-export { createMemoryAdapter, createWebStorageAdapter } from "./adapters";
+export { createWebStorageAdapter } from "./adapters";
 export { createStorageLayer } from "./storageLayer";
 export type {
   MaybePromise,

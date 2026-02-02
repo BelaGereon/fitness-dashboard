@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { createMemoryAdapter, createWebStorageAdapter } from "./adapters";
+import { createWebStorageAdapter } from "./adapters";
 import { createStorageLayer } from "./storageLayer";
+import { createMemoryAdapter } from "./testUtils";
 
 describe("createStorageLayer", () => {
   describe("load", () => {
