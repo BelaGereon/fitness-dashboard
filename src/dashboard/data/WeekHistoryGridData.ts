@@ -57,7 +57,7 @@ export function buildWeekHistoryGridRows(
 
   let previousAvgWeight: number | null = null;
 
-  return sortedWeeks.map((week) => {
+  const rows = sortedWeeks.map((week) => {
     const avgWeight = getAverage(week, (day) => day?.weightKg);
     const avgWeightDelta =
       typeof avgWeight === "number" && typeof previousAvgWeight === "number"
@@ -77,4 +77,6 @@ export function buildWeekHistoryGridRows(
       dailyCalories: getDailyCalories(week),
     };
   });
+
+  return rows.reverse();
 }
