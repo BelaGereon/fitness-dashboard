@@ -32,7 +32,7 @@ export function useFitnessWeeksStorage(
         if (!isActive) {
           return;
         }
-        if (payload?.weeks?.length) {
+        if (Array.isArray(payload?.weeks)) {
           setWeeks(payload.weeks);
         }
       })

@@ -77,7 +77,7 @@ describe("useFitnessWeeksStorage", () => {
     expect(result.current.weeks).toEqual(persistedWeeks);
   });
 
-  it("falls back to initial weeks when stored weeks are empty", async () => {
+  it("keeps stored empty weeks instead of falling back to initial", async () => {
     const adapter = createMemoryAdapter({
       fitnessWeeks: JSON.stringify({ weeks: [] }),
     });
@@ -91,7 +91,7 @@ describe("useFitnessWeeksStorage", () => {
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);
     });
-    expect(result.current.weeks).toEqual(initialWeeks);
+    expect(result.current.weeks).toEqual([]);
   });
 
   it("falls back to initial weeks when stored payload is invalid", async () => {
