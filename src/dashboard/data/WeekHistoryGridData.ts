@@ -5,6 +5,7 @@ export type WeekHistoryRow = {
   weekOf: string;
   avgWeightKg: number | null;
   avgWeightDeltaKg: number | null;
+  dailyWeights: Array<number | null>;
   avgCalories: number | null;
   avgProteinG: number | null;
   dailyCalories: number[];
@@ -40,6 +41,13 @@ function getDailyCalories(week: FitnessWeek): number[] {
   });
 }
 
+function getDailyWeights(week: FitnessWeek): Array<number | null> {
+  return dayKeys.map((dayKey) => {
+    const weight = week.days?.[dayKey]?.weightKg;
+    return typeof weight === "number" ? weight : null;
+  });
+}
+
 export function buildWeekHistoryGridRows(
   weeks: FitnessWeek[],
 ): WeekHistoryRow[] {
@@ -63,6 +71,7 @@ export function buildWeekHistoryGridRows(
       weekOf: week.weekOf,
       avgWeightKg: avgWeight,
       avgWeightDeltaKg: avgWeightDelta,
+      dailyWeights: getDailyWeights(week),
       avgCalories: getAverage(week, (day) => day?.calories),
       avgProteinG: getAverage(week, (day) => day?.proteinG),
       dailyCalories: getDailyCalories(week),

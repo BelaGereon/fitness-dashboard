@@ -6,6 +6,8 @@ import type { WeekHistoryRow } from "../data/WeekHistoryGridData";
 
 export default function WeekHistoryDataGrid() {
   const rows = useWeekHistoryGridRows();
+  const pageSize = 12;
+  const shouldAutoHeight = rows.length > 0 && rows.length < pageSize;
 
   const handleEditWeek = useCallback((row: WeekHistoryRow) => {
     console.info("Edit week", row);
@@ -21,13 +23,18 @@ export default function WeekHistoryDataGrid() {
       checkboxSelection
       rows={rows}
       columns={columns}
+      sx={{
+        width: "100%",
+        height: shouldAutoHeight ? "auto" : 520,
+      }}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
       }
       initialState={{
-        pagination: { paginationModel: { pageSize: 20 } },
+        pagination: { paginationModel: { pageSize } },
       }}
-      pageSizeOptions={[10, 20, 50]}
+      pageSizeOptions={[4, 8, 12, 24, 52]}
+      autoHeight={shouldAutoHeight}
       disableColumnResize
       density="compact"
       slotProps={{
