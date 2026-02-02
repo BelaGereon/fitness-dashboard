@@ -10,7 +10,7 @@ import Header from "./components/Header";
 import MainGrid from "./components/MainGrid";
 import SideMenu from "./components/SideMenu";
 import AppTheme from "../shared-theme/AppTheme";
-import { FitnessWeeksDataProvider } from "./data/FitnessWeeksData";
+import { FitnessWeeksDataProvider } from "./data/FitnessWeeksDataProvider";
 import { weightHistoryWeeks } from "./data/weightHistoryWeeks";
 import {
   chartsCustomizations,
