@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useFitnessWeeks } from "../FitnessWeeksDataProvider";
+import { buildWeekHistoryGridRows } from "../WeekHistoryGridData";
 import { buildSeries, buildSummary } from "../WeightHistoryData";
 
 export function useWeightHistoryData() {
@@ -15,4 +16,9 @@ export function useWeightHistorySeries() {
 
 export function useWeightHistorySummary() {
   return useWeightHistoryData().summary;
+}
+
+export function useWeekHistoryGridRows() {
+  const { weeks } = useFitnessWeeks();
+  return useMemo(() => buildWeekHistoryGridRows(weeks), [weeks]);
 }
