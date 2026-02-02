@@ -6,6 +6,10 @@ import { createMemoryAdapter } from "../../storage/testUtils";
 import type { FitnessWeek } from "../fitnessTypes";
 import { useFitnessWeeksStorage } from "./useFitnessWeeksStorage";
 
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean;
+}
+
 const initialWeeks: FitnessWeek[] = [
   {
     id: "initial",
