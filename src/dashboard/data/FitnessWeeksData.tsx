@@ -2,15 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
-  useMemo,
-  useState,
   type ReactNode,
   type Dispatch,
   type SetStateAction,
 } from "react";
-import type { FitnessWeek, FitnessWeeksPayload } from "../fitnessTypes";
-import { createStorageLayer, useStorageAdapter } from "../../storage";
+import type { FitnessWeek } from "../fitnessTypes";
+import { useFitnessWeeksStorage } from "./useFitnessWeeksStorage";
 
 type FitnessWeeksContextValue = {
   weeks: FitnessWeek[];
@@ -30,48 +27,8 @@ export function FitnessWeeksDataProvider({
   initialWeeks,
   children,
 }: FitnessWeeksDataProviderProps) {
-  const adapter = useStorageAdapter();
-  const storage = useMemo(
-    () =>
-      createStorageLayer<FitnessWeeksPayload>({
-        key: "fitnessWeeks",
-        adapter,
-      }),
-    [adapter],
-  );
-  const [weeks, setWeeks] = useState<FitnessWeek[]>(initialWeeks);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    let isActive = true;
-
-    storage
-      .load()
-      .then((payload) => {
-        if (!isActive) {
-          return;
-        }
-        if (payload?.weeks?.length) {
-          setWeeks(payload.weeks);
-        }
-      })
-      .finally(() => {
-        if (isActive) {
-          setIsHydrated(true);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [storage]);
-
-  useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-    void storage.save({ weeks });
-  }, [isHydrated, storage, weeks]);
+  const { weeks, setWeeks, isHydrated } =
+    useFitnessWeeksStorage(initialWeeks);
 
   const addWeek = useCallback((week: FitnessWeek) => {
     setWeeks((prevWeeks) => [...prevWeeks, week]);
