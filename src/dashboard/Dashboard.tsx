@@ -10,6 +10,8 @@ import Header from "./components/Header";
 import MainGrid from "./components/MainGrid";
 import SideMenu from "./components/SideMenu";
 import AppTheme from "../shared-theme/AppTheme";
+import { FitnessWeeksDataProvider } from "./data/FitnessWeeksDataProvider";
+import { weightHistoryWeeks } from "./data/weightHistoryWeeks";
 import {
   chartsCustomizations,
   dataGridCustomizations,
@@ -51,8 +53,10 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               mt: { xs: 8, md: 0 },
             }}
           >
-            <Header />
-            <MainGrid />
+            <FitnessWeeksDataProvider initialWeeks={weightHistoryWeeks}>
+              <Header />
+              <MainGrid />
+            </FitnessWeeksDataProvider>
           </Stack>
         </Box>
       </Box>

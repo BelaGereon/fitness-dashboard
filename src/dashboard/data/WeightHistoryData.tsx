@@ -1,6 +1,4 @@
-import { useMemo } from "react";
 import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
-import { useFitnessWeeks } from "./FitnessWeeksData";
 
 const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -53,7 +51,7 @@ function getLastLoggedDayKey(week: FitnessWeek): WeekDayKey | null {
   return null;
 }
 
-function buildSeries(weeks: FitnessWeek[]): WeightHistorySeries {
+export function buildSeries(weeks: FitnessWeek[]): WeightHistorySeries {
   const labels: string[] = [];
   const weights: Array<number | null> = [];
   const avgWeights: Array<number | null> = [];
@@ -95,7 +93,9 @@ function buildSeries(weeks: FitnessWeek[]): WeightHistorySeries {
   return { labels, weights, avgWeights, yAxisMin, yAxisMax };
 }
 
-function buildSummary(weights: Array<number | null>): WeightHistorySummary {
+export function buildSummary(
+  weights: Array<number | null>,
+): WeightHistorySummary {
   const definedWeights = weights.filter(
     (value): value is number => typeof value === "number",
   );
@@ -110,19 +110,4 @@ function buildSummary(weights: Array<number | null>): WeightHistorySummary {
       : null;
 
   return { latestWeight, changePercent };
-}
-
-export function useWeightHistoryData() {
-  const weeks = useFitnessWeeks();
-  const series = useMemo(() => buildSeries(weeks), [weeks]);
-  const summary = useMemo(() => buildSummary(series.weights), [series]);
-  return { series, summary };
-}
-
-export function useWeightHistorySeries() {
-  return useWeightHistoryData().series;
-}
-
-export function useWeightHistorySummary() {
-  return useWeightHistoryData().summary;
 }
