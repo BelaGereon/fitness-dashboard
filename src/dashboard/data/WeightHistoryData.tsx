@@ -113,7 +113,7 @@ function buildSummary(weights: Array<number | null>): WeightHistorySummary {
 }
 
 export function useWeightHistoryData() {
-  const weeks = useFitnessWeeks();
+  const { weeks } = useFitnessWeeks();
   const series = useMemo(() => buildSeries(weeks), [weeks]);
   const summary = useMemo(() => buildSummary(series.weights), [series]);
   return { series, summary };

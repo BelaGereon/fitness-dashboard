@@ -1,10 +1,19 @@
-import AppTheme from "./shared-theme/AppTheme";
+import { useMemo } from "react";
 import Dashboard from "./dashboard/Dashboard";
+import { StorageAdapterProvider, createWebStorageAdapter } from "./storage";
+import AppTheme from "./shared-theme/AppTheme";
 
 export default function App() {
+  const adapter = useMemo(
+    () => createWebStorageAdapter(window.localStorage),
+    [],
+  );
+
   return (
     <AppTheme>
-      <Dashboard />
+      <StorageAdapterProvider adapter={adapter}>
+        <Dashboard />
+      </StorageAdapterProvider>
     </AppTheme>
   );
 }
