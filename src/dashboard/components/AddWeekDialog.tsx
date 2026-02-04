@@ -1,0 +1,327 @@
+import { useCallback, useMemo, useState } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import dayjs, { type Dayjs } from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useFitnessWeeks } from "../data/FitnessWeeksDataProvider";
+import type { FitnessDay, FitnessWeek, WeekDayKey } from "../fitnessTypes";
+
+type DayInputs = {
+  weightKg: string;
+  calories: string;
+  proteinG: string;
+};
+
+const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const dayLabels: Record<WeekDayKey, string> = {
+  mon: "Mon",
+  tue: "Tue",
+  wed: "Wed",
+  thu: "Thu",
+  fri: "Fri",
+  sat: "Sat",
+  sun: "Sun",
+};
+
+function getWeekMonday(value: Dayjs) {
+  const date = value.toDate();
+  const dayOfWeek = date.getDay();
+  const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  date.setDate(date.getDate() + offset);
+  return dayjs(date).startOf("day");
+}
+
+function createInitialDayInputs(): Record<WeekDayKey, DayInputs> {
+  return dayKeys.reduce(
+    (acc, dayKey) => {
+      acc[dayKey] = {
+        weightKg: "",
+        calories: "",
+        proteinG: "",
+      };
+      return acc;
+    },
+    {} as Record<WeekDayKey, DayInputs>,
+  );
+}
+
+function parseNumber(value: string) {
+  if (!value.trim()) {
+    return undefined;
+  }
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+export default function AddWeekDialog() {
+  const { weeks, addWeek } = useFitnessWeeks();
+  const [open, setOpen] = useState(false);
+  const [weekStart, setWeekStart] = useState(() => getWeekMonday(dayjs()));
+  const [days, setDays] = useState(createInitialDayInputs);
+  const [trainingDescription, setTrainingDescription] = useState("");
+  const [totalSets, setTotalSets] = useState("");
+  const [totalVolumeKg, setTotalVolumeKg] = useState("");
+  const [notes, setNotes] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const weekOf = useMemo(
+    () => weekStart.format("YYYY-MM-DD"),
+    [weekStart],
+  );
+
+  const resetForm = useCallback(() => {
+    setWeekStart(getWeekMonday(dayjs()));
+    setDays(createInitialDayInputs());
+    setTrainingDescription("");
+    setTotalSets("");
+    setTotalVolumeKg("");
+    setNotes("");
+    setError(null);
+  }, []);
+
+  const handleOpen = useCallback(() => {
+    resetForm();
+    setOpen(true);
+  }, [resetForm]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const handleWeekChange = useCallback((value: Dayjs | null) => {
+    if (!value) {
+      return;
+    }
+    setWeekStart(getWeekMonday(value));
+    setError(null);
+  }, []);
+
+  const handleDayChange = useCallback(
+    (dayKey: WeekDayKey, field: keyof DayInputs, value: string) => {
+      setDays((prev) => ({
+        ...prev,
+        [dayKey]: {
+          ...prev[dayKey],
+          [field]: value,
+        },
+      }));
+    },
+    [],
+  );
+
+  const buildDayPayload = useCallback((inputs: DayInputs): FitnessDay | null => {
+    const weightKg = parseNumber(inputs.weightKg);
+    const calories = parseNumber(inputs.calories);
+    const proteinG = parseNumber(inputs.proteinG);
+
+    if (
+      typeof weightKg !== "number" &&
+      typeof calories !== "number" &&
+      typeof proteinG !== "number"
+    ) {
+      return null;
+    }
+
+    return {
+      ...(typeof weightKg === "number" ? { weightKg } : {}),
+      ...(typeof calories === "number" ? { calories } : {}),
+      ...(typeof proteinG === "number" ? { proteinG } : {}),
+    };
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (weeks.some((week) => week.weekOf === weekOf)) {
+      setError(`Week starting ${weekOf} already exists.`);
+      return;
+    }
+
+    const dayPayload = dayKeys.reduce((acc, dayKey) => {
+      const payload = buildDayPayload(days[dayKey]);
+      if (payload) {
+        acc[dayKey] = payload;
+      }
+      return acc;
+    }, {} as FitnessWeek["days"]);
+
+    const week: FitnessWeek = {
+      id: weekOf,
+      weekOf,
+      days: dayPayload,
+      trainingSessionsDescription: trainingDescription.trim() || undefined,
+      totalSets: parseNumber(totalSets),
+      totalVolumeKg: parseNumber(totalVolumeKg),
+      notes: notes.trim() || undefined,
+    };
+
+    addWeek(week);
+    setOpen(false);
+  }, [
+    addWeek,
+    buildDayPayload,
+    days,
+    notes,
+    totalSets,
+    totalVolumeKg,
+    trainingDescription,
+    weekOf,
+    weeks,
+  ]);
+
+  return (
+    <>
+      <Button variant="contained" size="small" onClick={handleOpen}>
+        Add Week
+      </Button>
+      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+        <DialogTitle>Add Week</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Week of (auto-selects Monday)"
+                value={weekStart}
+                onChange={handleWeekChange}
+                format="MMM DD, YYYY"
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                    helperText: `Week starts on ${weekOf}`,
+                  },
+                }}
+              />
+            </LocalizationProvider>
+            {error ? (
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+            ) : null}
+            <Stack spacing={1}>
+              <Typography variant="subtitle2">Daily metrics</Typography>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ display: { xs: "none", sm: "flex" } }}
+              >
+                <Box sx={{ width: 70 }} />
+                <Typography variant="caption" sx={{ flex: 1 }}>
+                  Weight (kg)
+                </Typography>
+                <Typography variant="caption" sx={{ flex: 1 }}>
+                  Calories
+                </Typography>
+                <Typography variant="caption" sx={{ flex: 1 }}>
+                  Protein (g)
+                </Typography>
+              </Stack>
+              {dayKeys.map((dayKey) => {
+                const inputs = days[dayKey];
+                return (
+                  <Stack
+                    key={dayKey}
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    alignItems={{ sm: "center" }}
+                  >
+                    <Typography sx={{ width: { sm: 70 } }}>
+                      {dayLabels[dayKey]}
+                    </Typography>
+                    <TextField
+                      label="Weight (kg)"
+                      value={inputs.weightKg}
+                      onChange={(event) =>
+                        handleDayChange(dayKey, "weightKg", event.target.value)
+                      }
+                      size="small"
+                      type="number"
+                      inputProps={{ step: 0.1, min: 0 }}
+                      sx={{ flex: 1 }}
+                    />
+                    <TextField
+                      label="Calories"
+                      value={inputs.calories}
+                      onChange={(event) =>
+                        handleDayChange(dayKey, "calories", event.target.value)
+                      }
+                      size="small"
+                      type="number"
+                      inputProps={{ step: 1, min: 0 }}
+                      sx={{ flex: 1 }}
+                    />
+                    <TextField
+                      label="Protein (g)"
+                      value={inputs.proteinG}
+                      onChange={(event) =>
+                        handleDayChange(dayKey, "proteinG", event.target.value)
+                      }
+                      size="small"
+                      type="number"
+                      inputProps={{ step: 1, min: 0 }}
+                      sx={{ flex: 1 }}
+                    />
+                  </Stack>
+                );
+              })}
+            </Stack>
+            <Divider />
+            <Stack spacing={2}>
+              <Typography variant="subtitle2">Workout & notes</Typography>
+              <TextField
+                label="Workout summary"
+                value={trainingDescription}
+                onChange={(event) => setTrainingDescription(event.target.value)}
+                size="small"
+                multiline
+                minRows={2}
+              />
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                <TextField
+                  label="Total sets"
+                  value={totalSets}
+                  onChange={(event) => setTotalSets(event.target.value)}
+                  size="small"
+                  type="number"
+                  inputProps={{ step: 1, min: 0 }}
+                  sx={{ flex: 1 }}
+                />
+                <TextField
+                  label="Total volume (kg)"
+                  value={totalVolumeKg}
+                  onChange={(event) => setTotalVolumeKg(event.target.value)}
+                  size="small"
+                  type="number"
+                  inputProps={{ step: 0.1, min: 0 }}
+                  sx={{ flex: 1 }}
+                />
+              </Stack>
+              <TextField
+                label="General notes"
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                size="small"
+                multiline
+                minRows={3}
+              />
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained">
+            Save week
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}

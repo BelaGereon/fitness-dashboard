@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Copyright from "../internals/components/Copyright";
 import ChartUserByCountry from "./ChartUserByCountry";
 import CustomizedTreeView from "./CustomizedTreeView";
+import AddWeekDialog from "./AddWeekDialog";
 import WeekHistoryDataGrid from "./WeekHistoryDataGrid";
 import HighlightedCard from "./HighlightedCard";
 import PageViewsBarChart from "./PageViewsBarChart";
@@ -78,6 +79,9 @@ export default function MainGrid() {
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ xs: 12, lg: 9 }}>
+          <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1 }}>
+            <AddWeekDialog />
+          </Stack>
           <WeekHistoryDataGrid />
         </Grid>
         <Grid size={{ xs: 12, lg: 3 }}>
