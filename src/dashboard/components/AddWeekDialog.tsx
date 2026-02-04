@@ -43,7 +43,7 @@ const dayLabels: Record<WeekDayKey, string> = {
   sun: "Sun",
 };
 
-function getWeekMonday(value: Dayjs) {
+export function getWeekMonday(value: Dayjs) {
   const date = value.toDate();
   const dayOfWeek = date.getDay();
   const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -51,7 +51,7 @@ function getWeekMonday(value: Dayjs) {
   return dayjs(date).startOf("day");
 }
 
-function createInitialDayInputs(): Record<WeekDayKey, DayInputs> {
+export function createInitialDayInputs(): Record<WeekDayKey, DayInputs> {
   return dayKeys.reduce(
     (acc, dayKey) => {
       acc[dayKey] = {
@@ -65,7 +65,7 @@ function createInitialDayInputs(): Record<WeekDayKey, DayInputs> {
   );
 }
 
-function createDayInputsFromWeek(
+export function createDayInputsFromWeek(
   week?: FitnessWeek,
 ): Record<WeekDayKey, DayInputs> {
   if (!week) {
@@ -86,7 +86,7 @@ function createDayInputsFromWeek(
   );
 }
 
-function getWeekStartFromWeek(week?: FitnessWeek) {
+export function getWeekStartFromWeek(week?: FitnessWeek) {
   if (!week?.weekOf) {
     return getWeekMonday(dayjs());
   }
@@ -94,7 +94,7 @@ function getWeekStartFromWeek(week?: FitnessWeek) {
   return parsed.isValid() ? getWeekMonday(parsed) : getWeekMonday(dayjs());
 }
 
-function parseNumber(value: string) {
+export function parseNumber(value: string) {
   if (!value.trim()) {
     return undefined;
   }
