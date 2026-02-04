@@ -1,16 +1,16 @@
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Copyright from "../internals/components/Copyright";
 import ChartUserByCountry from "./ChartUserByCountry";
 import CustomizedTreeView from "./CustomizedTreeView";
-import AddWeekDialog from "./AddWeekDialog";
 import WeekHistoryDataGrid from "./WeekHistoryDataGrid";
 import HighlightedCard from "./HighlightedCard";
 import PageViewsBarChart from "./PageViewsBarChart";
 import WeightHistoryChart from "./WeightHistoryChart";
 import StatCard, { StatCardProps } from "./StatCard";
+import Stack from "@mui/material/Stack";
+import AddWeekDialog from "./AddWeekDialog";
 
 const data: StatCardProps[] = [
   {
@@ -74,21 +74,15 @@ export default function MainGrid() {
           <PageViewsBarChart />
         </Grid>
       </Grid>
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Week Data
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+        <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+          Week Data
+        </Typography>
+        <AddWeekDialog />
+      </Stack>
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ xs: 12, lg: 9 }}>
-          <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1 }}>
-            <AddWeekDialog />
-          </Stack>
+        <Grid size={{ xs: 12, lg: 12 }}>
           <WeekHistoryDataGrid />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 3 }}>
-          <Stack gap={2} direction={{ xs: "column", sm: "row", lg: "column" }}>
-            <CustomizedTreeView />
-            <ChartUserByCountry />
-          </Stack>
         </Grid>
       </Grid>
       <Copyright sx={{ my: 4 }} />
