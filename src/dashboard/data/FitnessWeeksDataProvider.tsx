@@ -7,7 +7,7 @@ import {
   type SetStateAction,
 } from "react";
 import type { FitnessWeek } from "../fitnessTypes";
-import { useFitnessWeeksStorage } from "./useFitnessWeeksStorage";
+import { useFitnessWeeksStorage } from "./hooks/useFitnessWeeksStorage";
 
 type FitnessWeeksContextValue = {
   weeks: FitnessWeek[];
