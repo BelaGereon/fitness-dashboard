@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { createStorageLayer, useStorageAdapter } from "../../storage";
-import type { FitnessWeek, FitnessWeeksPayload } from "../fitnessTypes";
+import { createStorageLayer, useStorageAdapter } from "../../../storage";
+import type { FitnessWeek, FitnessWeeksPayload } from "../../fitnessTypes";
 
 type UseFitnessWeeksStorageResult = {
   weeks: FitnessWeek[];

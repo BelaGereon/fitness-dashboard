@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { StorageAdapterProvider } from "../../storage/StorageAdapterProvider";
-import { createMemoryAdapter } from "../../storage/testUtils";
-import type { FitnessWeek } from "../fitnessTypes";
+import { StorageAdapterProvider } from "../../../storage/StorageAdapterProvider";
+import { createMemoryAdapter } from "../../../storage/testUtils";
+import type { FitnessWeek } from "../../fitnessTypes";
 import { useFitnessWeeksStorage } from "./useFitnessWeeksStorage";
 
 declare global {
@@ -49,10 +49,9 @@ describe("useFitnessWeeksStorage", () => {
     const adapter = createMemoryAdapter();
     const wrapper = createWrapper(adapter);
 
-    const { result } = renderHook(
-      () => useFitnessWeeksStorage(initialWeeks),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFitnessWeeksStorage(initialWeeks), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);
@@ -66,10 +65,9 @@ describe("useFitnessWeeksStorage", () => {
     });
     const wrapper = createWrapper(adapter);
 
-    const { result } = renderHook(
-      () => useFitnessWeeksStorage(initialWeeks),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFitnessWeeksStorage(initialWeeks), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);
@@ -83,10 +81,9 @@ describe("useFitnessWeeksStorage", () => {
     });
     const wrapper = createWrapper(adapter);
 
-    const { result } = renderHook(
-      () => useFitnessWeeksStorage(initialWeeks),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFitnessWeeksStorage(initialWeeks), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);
@@ -100,10 +97,9 @@ describe("useFitnessWeeksStorage", () => {
     });
     const wrapper = createWrapper(adapter);
 
-    const { result } = renderHook(
-      () => useFitnessWeeksStorage(initialWeeks),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFitnessWeeksStorage(initialWeeks), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);
@@ -115,10 +111,9 @@ describe("useFitnessWeeksStorage", () => {
     const adapter = createMemoryAdapter();
     const wrapper = createWrapper(adapter);
 
-    const { result } = renderHook(
-      () => useFitnessWeeksStorage(initialWeeks),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useFitnessWeeksStorage(initialWeeks), {
+      wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isHydrated).toBe(true);

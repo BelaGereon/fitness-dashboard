@@ -1,15 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 import dayjs from "dayjs";
-import type { FitnessWeek } from "../fitnessTypes";
+import type { FitnessWeek } from "../../fitnessTypes";
 import {
+  buildFitnessDayPayload,
   createDayInputsFromWeek,
   createInitialDayInputs,
   getWeekMonday,
   getWeekStartFromWeek,
   parseNumber,
-} from "./AddWeekDialog";
+} from "./weekEditorHelpers";
 
-describe("AddWeekDialog helpers", () => {
+describe("weekEditorHelpers", () => {
   describe("getWeekMonday", () => {
     it("returns the Monday for a mid-week date", () => {
       const result = getWeekMonday(dayjs("2026-01-07"));
@@ -103,6 +104,27 @@ describe("AddWeekDialog helpers", () => {
     it("returns numeric values for valid input", () => {
       expect(parseNumber("0")).toBe(0);
       expect(parseNumber("12.5")).toBe(12.5);
+    });
+  });
+
+  describe("buildFitnessDayPayload", () => {
+    it("returns null when no valid numeric fields are present", () => {
+      expect(
+        buildFitnessDayPayload({ weightKg: "", calories: "", proteinG: "" }),
+      ).toBeNull();
+    });
+
+    it("returns only parsed numeric fields", () => {
+      expect(
+        buildFitnessDayPayload({
+          weightKg: "80.1",
+          calories: "not-a-number",
+          proteinG: "140",
+        }),
+      ).toEqual({
+        weightKg: 80.1,
+        proteinG: 140,
+      });
     });
   });
 });

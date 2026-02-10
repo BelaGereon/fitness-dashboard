@@ -1,6 +1,6 @@
-import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
-
-const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+import type { FitnessWeek } from "../fitnessTypes";
+import type { WeekDayKey } from "./constants/weekDays";
+import { weekDayKeys } from "./constants/weekDays";
 
 const dayOffsets: Record<WeekDayKey, number> = {
   mon: 0,
@@ -27,7 +27,7 @@ type WeightHistorySummary = {
 
 function getAvgWeightForWeek(week: FitnessWeek): number | null {
   const dayWeights: number[] = [];
-  dayKeys.forEach((dayKey) => {
+  weekDayKeys.forEach((dayKey) => {
     const day = week.days?.[dayKey];
     if (day && typeof day.weightKg === "number") {
       dayWeights.push(day.weightKg);
@@ -41,8 +41,8 @@ function getAvgWeightForWeek(week: FitnessWeek): number | null {
 }
 
 function getLastLoggedDayKey(week: FitnessWeek): WeekDayKey | null {
-  for (let i = dayKeys.length - 1; i >= 0; i -= 1) {
-    const dayKey = dayKeys[i];
+  for (let i = weekDayKeys.length - 1; i >= 0; i -= 1) {
+    const dayKey = weekDayKeys[i];
     const day = week.days?.[dayKey];
     if (day && typeof day.weightKg === "number") {
       return dayKey;
@@ -63,7 +63,7 @@ export function buildSeries(weeks: FitnessWeek[]): WeightHistorySeries {
     const lastLoggedDayKey = isLastWeek ? getLastLoggedDayKey(week) : null;
     const avgDayKey = isLastWeek ? lastLoggedDayKey : "mon";
 
-    dayKeys.forEach((dayKey) => {
+    weekDayKeys.forEach((dayKey) => {
       const dayDate = new Date(weekStart);
       dayDate.setDate(dayDate.getDate() + dayOffsets[dayKey]);
       const dateLabel = dayDate.toLocaleDateString("en-DE", {
