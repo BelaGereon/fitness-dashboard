@@ -29,11 +29,16 @@ function toTrend(changePercent: number | null): StatCardProps["trend"] {
 }
 
 function toChartData(values: Array<number | null>): number[] {
-  const sanitized = values.map((value) => (typeof value === "number" ? value : 0));
+  const sanitized = values.map((value) =>
+    typeof value === "number" ? value : 0,
+  );
   return sanitized.length > 0 ? sanitized : [0];
 }
 
-function toRoundedChartData(values: Array<number | null>, decimals: number): number[] {
+function toRoundedChartData(
+  values: Array<number | null>,
+  decimals: number,
+): number[] {
   const factor = 10 ** decimals;
   const sanitized = values.map((value) => {
     if (typeof value !== "number") {
@@ -44,7 +49,10 @@ function toRoundedChartData(values: Array<number | null>, decimals: number): num
   return sanitized.length > 0 ? sanitized : [0];
 }
 
-function toChartLabels(labels: string[], values: Array<number | null>): string[] {
+function toChartLabels(
+  labels: string[],
+  values: Array<number | null>,
+): string[] {
   if (labels.length === values.length && labels.length > 0) {
     return labels.map((label) => {
       const parsed = new Date(`${label}T00:00:00`);
@@ -124,11 +132,8 @@ export default function MainGrid() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <HighlightedCard />
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 12 }}>
           <WeightHistoryChart />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <PageViewsBarChart />
         </Grid>
       </Grid>
       <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
