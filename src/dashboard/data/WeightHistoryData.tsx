@@ -1,4 +1,5 @@
-import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
+import type { FitnessWeek } from "../fitnessTypes";
+import type { WeekDayKey } from "./constants/weekDays";
 import { weekDayKeys } from "./constants/weekDays";
 
 const dayOffsets: Record<WeekDayKey, number> = {

@@ -1,4 +1,4 @@
-export type WeekDayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+import { WeekDayKey } from "./data/constants/weekDays";
 
 export type FitnessDay = {
   weightKg?: number;

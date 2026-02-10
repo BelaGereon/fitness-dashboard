@@ -11,7 +11,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useFitnessWeeks } from "../data/FitnessWeeksDataProvider";
-import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
+import type { FitnessWeek } from "../fitnessTypes";
+import type { WeekDayKey } from "../data/constants/weekDays";
 import { weekDayKeys } from "../data/constants/weekDays";
 import {
   buildFitnessDayPayload,

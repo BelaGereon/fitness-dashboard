@@ -1,5 +1,6 @@
 import dayjs, { type Dayjs } from "dayjs";
-import type { FitnessDay, FitnessWeek, WeekDayKey } from "../../fitnessTypes";
+import type { FitnessDay, FitnessWeek } from "../../fitnessTypes";
+import type { WeekDayKey } from "../constants/weekDays";
 import { weekDayKeys } from "../constants/weekDays";
 
 export type DayInputs = {
