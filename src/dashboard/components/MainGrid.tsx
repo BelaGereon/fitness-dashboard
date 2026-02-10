@@ -4,7 +4,6 @@ import Typography from "@mui/material/Typography";
 import Copyright from "../internals/components/Copyright";
 import WeekHistoryDataGrid from "./WeekHistoryDataGrid";
 import HighlightedCard from "./HighlightedCard";
-import PageViewsBarChart from "./PageViewsBarChart";
 import WeightHistoryChart from "./WeightHistoryChart";
 import StatCard, { StatCardProps } from "./StatCard";
 import Stack from "@mui/material/Stack";
