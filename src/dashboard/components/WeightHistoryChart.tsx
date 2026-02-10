@@ -7,6 +7,7 @@ import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
 
 import { useWeightHistoryData } from "../data/hooks/dataHooks";
+import { ChartLinearGradient } from "./charts/ChartLinearGradient";
 
 export default function WeightHistoryChart() {
   const theme = useTheme();
@@ -105,18 +106,9 @@ export default function WeightHistoryChart() {
           }}
           hideLegend
         >
-          <VerticalGradient id="weight" color={theme.palette.primary.main} />
+          <ChartLinearGradient id="weight" color={theme.palette.primary.main} />
         </LineChart>
       </CardContent>
     </Card>
-  );
-}
-
-function VerticalGradient({ id, color }: { id: string; color: string }) {
-  return (
-    <linearGradient id={id} x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stopOpacity={0.1} stopColor={color} />
-      <stop offset="100%" stopOpacity={0.7} stopColor={color} />
-    </linearGradient>
   );
 }

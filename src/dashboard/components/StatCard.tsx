@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 import { areaElementClasses } from '@mui/x-charts/LineChart';
-import { getDaysInMonth } from '../data/utils/dateLabels';
+import { ChartLinearGradient } from './charts/ChartLinearGradient';
 
 export type StatCardProps = {
   title: string;
@@ -15,18 +15,8 @@ export type StatCardProps = {
   interval: string;
   trend: 'up' | 'down' | 'neutral';
   data: number[];
+  labels?: string[];
 };
-
-function AreaGradient({ color, id }: { color: string; id: string }) {
-  return (
-    <defs>
-      <linearGradient id={id} x1="50%" y1="0%" x2="50%" y2="100%">
-        <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-        <stop offset="100%" stopColor={color} stopOpacity={0} />
-      </linearGradient>
-    </defs>
-  );
-}
 
 export default function StatCard({
   title,
@@ -34,24 +24,13 @@ export default function StatCard({
   interval,
   trend,
   data,
+  labels,
 }: StatCardProps) {
   const theme = useTheme();
-  const daysInWeek = getDaysInMonth(4, 2024);
-
-  const trendColors = {
-    up:
-      theme.palette.mode === 'light'
-        ? theme.palette.success.main
-        : theme.palette.success.dark,
-    down:
-      theme.palette.mode === 'light'
-        ? theme.palette.error.main
-        : theme.palette.error.dark,
-    neutral:
-      theme.palette.mode === 'light'
-        ? theme.palette.grey[400]
-        : theme.palette.grey[700],
-  };
+  const xAxisLabels =
+    labels && labels.length === data.length
+      ? labels
+      : data.map((_value, index) => `${index + 1}`);
 
   const labelColors = {
     up: 'success' as const,
@@ -60,8 +39,9 @@ export default function StatCard({
   };
 
   const color = labelColors[trend];
-  const chartColor = trendColors[trend];
+  const chartColor = theme.palette.primary.main;
   const trendValues = { up: '+25%', down: '-25%', neutral: '+5%' };
+  const gradientId = `area-gradient-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
   return (
     <Card variant="outlined" sx={{ height: '100%', flexGrow: 1 }}>
@@ -96,15 +76,26 @@ export default function StatCard({
               showTooltip
               xAxis={{
                 scaleType: 'band',
-                data: daysInWeek, // Use the correct property 'data' for xAxis
+                data: xAxisLabels,
               }}
               sx={{
                 [`& .${areaElementClasses.root}`]: {
-                  fill: `url(#area-gradient-${value})`,
+                  fill: `url(#${gradientId})`,
                 },
               }}
             >
-              <AreaGradient color={chartColor} id={`area-gradient-${value}`} />
+              <defs>
+                <ChartLinearGradient
+                  id={gradientId}
+                  color={chartColor}
+                  x1="50%"
+                  y1="0%"
+                  x2="50%"
+                  y2="100%"
+                  startOpacity={0.3}
+                  endOpacity={0}
+                />
+              </defs>
             </SparkLineChart>
           </Box>
         </Stack>

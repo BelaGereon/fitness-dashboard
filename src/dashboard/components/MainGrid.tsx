@@ -33,6 +33,33 @@ function toChartData(values: Array<number | null>): number[] {
   return sanitized.length > 0 ? sanitized : [0];
 }
 
+function toRoundedChartData(values: Array<number | null>, decimals: number): number[] {
+  const factor = 10 ** decimals;
+  const sanitized = values.map((value) => {
+    if (typeof value !== "number") {
+      return 0;
+    }
+    return Math.round(value * factor) / factor;
+  });
+  return sanitized.length > 0 ? sanitized : [0];
+}
+
+function toChartLabels(labels: string[], values: Array<number | null>): string[] {
+  if (labels.length === values.length && labels.length > 0) {
+    return labels.map((label) => {
+      const parsed = new Date(`${label}T00:00:00`);
+      if (Number.isNaN(parsed.getTime())) {
+        return label;
+      }
+      return parsed.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    });
+  }
+  return values.map((_value, index) => `#${index + 1}`);
+}
+
 export default function MainGrid() {
   const caloriesHistory = useCaloriesHistoryData();
   const proteinHistory = useProteinHistoryData();
@@ -48,6 +75,7 @@ export default function MainGrid() {
       interval: "Per week average",
       trend: toTrend(caloriesHistory.changePercent),
       data: toChartData(caloriesHistory.values),
+      labels: toChartLabels(caloriesHistory.labels, caloriesHistory.values),
     },
     {
       title: "Avg Protein",
@@ -57,17 +85,22 @@ export default function MainGrid() {
           : "--",
       interval: "Per week average",
       trend: toTrend(proteinHistory.changePercent),
-      data: toChartData(proteinHistory.values),
+      data: toRoundedChartData(proteinHistory.values, 1),
+      labels: toChartLabels(proteinHistory.labels, proteinHistory.values),
     },
     {
-      title: "Avg Steps",
+      title: "Avg Steps / Day",
       value:
         averageStepsHistory.latestValue !== null
-          ? `${Math.round(averageStepsHistory.latestValue)}`
+          ? `${Math.round(averageStepsHistory.latestValue).toLocaleString()}`
           : "--",
-      interval: "Average steps per day",
+      interval: "Weekly average steps per day",
       trend: toTrend(averageStepsHistory.changePercent),
       data: toChartData(averageStepsHistory.values),
+      labels: toChartLabels(
+        averageStepsHistory.labels,
+        averageStepsHistory.values,
+      ),
     },
   ];
 
