@@ -1,4 +1,5 @@
 import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
+import { weekDayKeys } from "./constants/weekDays";
 
 export type WeekHistoryRow = {
   id: string;
@@ -11,15 +12,13 @@ export type WeekHistoryRow = {
   dailyCalories: number[];
 };
 
-const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-
 function getAverage(
   week: FitnessWeek,
   selector: (day: FitnessWeek["days"][WeekDayKey]) => number | undefined,
 ): number | null {
   const values: number[] = [];
 
-  dayKeys.forEach((dayKey) => {
+  weekDayKeys.forEach((dayKey) => {
     const value = selector(week.days?.[dayKey]);
     if (typeof value === "number") {
       values.push(value);
@@ -35,14 +34,14 @@ function getAverage(
 }
 
 function getDailyCalories(week: FitnessWeek): number[] {
-  return dayKeys.map((dayKey) => {
+  return weekDayKeys.map((dayKey) => {
     const calories = week.days?.[dayKey]?.calories;
     return typeof calories === "number" ? calories : 0;
   });
 }
 
 function getDailyWeights(week: FitnessWeek): Array<number | null> {
-  return dayKeys.map((dayKey) => {
+  return weekDayKeys.map((dayKey) => {
     const weight = week.days?.[dayKey]?.weightKg;
     return typeof weight === "number" ? weight : null;
   });

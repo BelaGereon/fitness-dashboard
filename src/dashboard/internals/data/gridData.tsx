@@ -2,23 +2,9 @@ import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
 import { GridCellParams, GridRowsProp, GridColDef } from '@mui/x-data-grid';
 import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
+import { getDaysInMonth } from '../../data/utils/dateLabels';
 
 type SparkLineData = number[];
-
-function getDaysInMonth(month: number, year: number) {
-  const date = new Date(year, month, 0);
-  const monthName = date.toLocaleDateString('en-US', {
-    month: 'short',
-  });
-  const daysInMonth = date.getDate();
-  const days = [];
-  let i = 1;
-  while (days.length < daysInMonth) {
-    days.push(`${monthName} ${i}`);
-    i += 1;
-  }
-  return days;
-}
 
 function renderSparklineCell(params: GridCellParams<SparkLineData, any>) {
   const data = getDaysInMonth(4, 2024);

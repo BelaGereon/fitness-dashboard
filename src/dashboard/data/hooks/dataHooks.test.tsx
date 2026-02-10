@@ -1,10 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { StorageAdapterProvider } from "../../../storage/StorageAdapterProvider";
-import { createMemoryAdapter } from "../../../storage/testUtils";
-import { FitnessWeeksDataProvider } from "../FitnessWeeksDataProvider";
 import type { FitnessWeek } from "../../fitnessTypes";
 import { useWeekHistoryGridRows } from "./dataHooks";
+import { createFitnessWeeksHookWrapper } from "./testUtils";
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean;
@@ -27,20 +25,6 @@ const initialWeeks: FitnessWeek[] = [
   },
 ];
 
-function createWrapper(weeks: FitnessWeek[]) {
-  const adapter = createMemoryAdapter();
-
-  return function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <StorageAdapterProvider adapter={adapter}>
-        <FitnessWeeksDataProvider initialWeeks={weeks}>
-          {children}
-        </FitnessWeeksDataProvider>
-      </StorageAdapterProvider>
-    );
-  };
-}
-
 describe("useWeekHistoryGridRows", () => {
   beforeAll(() => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -51,7 +35,7 @@ describe("useWeekHistoryGridRows", () => {
   });
 
   it("returns rows derived from the fitness weeks provider", async () => {
-    const wrapper = createWrapper(initialWeeks);
+    const wrapper = createFitnessWeeksHookWrapper(initialWeeks);
     const { result } = renderHook(() => useWeekHistoryGridRows(), { wrapper });
 
     await waitFor(() => {

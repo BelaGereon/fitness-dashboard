@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { getWeekExportFilename, serializeWeekExport } from "./HighlightedCard";
-import { createWeekExportPayload } from "../data/download/download";
+import {
+  createWeekExportPayload,
+  getWeekExportFilename,
+  serializeWeekExport,
+} from "../data/download/weekExport";
 import type { FitnessWeek } from "../fitnessTypes";
 
-describe("HighlightedCard export helpers", () => {
+describe("week export helpers", () => {
   it("creates a payload with computed week rows", () => {
     const weeks: FitnessWeek[] = [
       {

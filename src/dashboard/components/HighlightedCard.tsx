@@ -8,38 +8,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { useCallback } from "react";
 import { useFitnessWeeks } from "../data/FitnessWeeksDataProvider";
-import type { FitnessWeek } from "../fitnessTypes";
 import { downloadWeekExport } from "../data/download/download";
-
-export type WeekExportPayload = {
-  generatedAt: string;
-  weeks: Array<FitnessWeek & { computedValues: ComputedWeekValues }>;
-};
-
-type ComputedWeekValues = {
-  avgWeightKg: number | null;
-  avgWeightDeltaKg: number | null;
-  avgCalories: number | null;
-  avgProteinG: number | null;
-};
-
-export function roundToOneDecimal(value: number | null) {
-  if (typeof value !== "number") {
-    return null;
-  }
-  return Math.round(value * 10) / 10;
-}
-
-export function serializeWeekExport(payload: WeekExportPayload) {
-  return JSON.stringify(payload, null, 2);
-}
-
-export function getWeekExportFilename(now: Date = new Date()) {
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `fitness-dashboard-weeks-${year}-${month}-${day}.json`;
-}
 
 export default function HighlightedCard() {
   const theme = useTheme();

@@ -6,18 +6,21 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import dayjs, { type Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useFitnessWeeks } from "../data/FitnessWeeksDataProvider";
-import type { FitnessDay, FitnessWeek, WeekDayKey } from "../fitnessTypes";
-
-type DayInputs = {
-  weightKg: string;
-  calories: string;
-  proteinG: string;
-};
+import type { FitnessWeek, WeekDayKey } from "../fitnessTypes";
+import { weekDayKeys } from "../data/constants/weekDays";
+import {
+  buildFitnessDayPayload,
+  createDayInputsFromWeek,
+  getWeekMonday,
+  getWeekStartFromWeek,
+  parseNumber,
+  type DayInputs,
+} from "../data/weekEditor/weekEditorHelpers";
 
 type WeekEditorDrawerProps = {
   open: boolean;
@@ -32,7 +35,6 @@ type EditWeekDialogProps = {
   week: FitnessWeek | null;
 };
 
-const dayKeys: WeekDayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const dayLabels: Record<WeekDayKey, string> = {
   mon: "Mon",
   tue: "Tue",
@@ -42,65 +44,6 @@ const dayLabels: Record<WeekDayKey, string> = {
   sat: "Sat",
   sun: "Sun",
 };
-
-export function getWeekMonday(value: Dayjs) {
-  const date = value.toDate();
-  const dayOfWeek = date.getDay();
-  const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  date.setDate(date.getDate() + offset);
-  return dayjs(date).startOf("day");
-}
-
-export function createInitialDayInputs(): Record<WeekDayKey, DayInputs> {
-  return dayKeys.reduce(
-    (acc, dayKey) => {
-      acc[dayKey] = {
-        weightKg: "",
-        calories: "",
-        proteinG: "",
-      };
-      return acc;
-    },
-    {} as Record<WeekDayKey, DayInputs>,
-  );
-}
-
-export function createDayInputsFromWeek(
-  week?: FitnessWeek,
-): Record<WeekDayKey, DayInputs> {
-  if (!week) {
-    return createInitialDayInputs();
-  }
-
-  return dayKeys.reduce(
-    (acc, dayKey) => {
-      const day = week.days?.[dayKey];
-      acc[dayKey] = {
-        weightKg: typeof day?.weightKg === "number" ? String(day.weightKg) : "",
-        calories: typeof day?.calories === "number" ? String(day.calories) : "",
-        proteinG: typeof day?.proteinG === "number" ? String(day.proteinG) : "",
-      };
-      return acc;
-    },
-    {} as Record<WeekDayKey, DayInputs>,
-  );
-}
-
-export function getWeekStartFromWeek(week?: FitnessWeek) {
-  if (!week?.weekOf) {
-    return getWeekMonday(dayjs());
-  }
-  const parsed = dayjs(week.weekOf);
-  return parsed.isValid() ? getWeekMonday(parsed) : getWeekMonday(dayjs());
-}
-
-export function parseNumber(value: string) {
-  if (!value.trim()) {
-    return undefined;
-  }
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
 
 function WeekEditorDrawer({
   open,
@@ -171,29 +114,6 @@ function WeekEditorDrawer({
     [],
   );
 
-  const buildDayPayload = useCallback(
-    (inputs: DayInputs): FitnessDay | null => {
-      const weightKg = parseNumber(inputs.weightKg);
-      const calories = parseNumber(inputs.calories);
-      const proteinG = parseNumber(inputs.proteinG);
-
-      if (
-        typeof weightKg !== "number" &&
-        typeof calories !== "number" &&
-        typeof proteinG !== "number"
-      ) {
-        return null;
-      }
-
-      return {
-        ...(typeof weightKg === "number" ? { weightKg } : {}),
-        ...(typeof calories === "number" ? { calories } : {}),
-        ...(typeof proteinG === "number" ? { proteinG } : {}),
-      };
-    },
-    [],
-  );
-
   const handleSave = useCallback(() => {
     if (isMissingEditWeek) {
       return;
@@ -209,9 +129,9 @@ function WeekEditorDrawer({
       return;
     }
 
-    const dayPayload = dayKeys.reduce(
+    const dayPayload = weekDayKeys.reduce(
       (acc, dayKey) => {
-        const payload = buildDayPayload(days[dayKey]);
+        const payload = buildFitnessDayPayload(days[dayKey]);
         if (payload) {
           acc[dayKey] = payload;
         }
@@ -241,7 +161,7 @@ function WeekEditorDrawer({
   }, [
     addWeek,
     avgStepsPerDay,
-    buildDayPayload,
+    buildFitnessDayPayload,
     days,
     initialWeek?.id,
     isMissingEditWeek,
@@ -314,7 +234,7 @@ function WeekEditorDrawer({
                 Protein (g)
               </Typography>
             </Stack>
-            {dayKeys.map((dayKey) => {
+            {weekDayKeys.map((dayKey) => {
               const inputs = days[dayKey];
               return (
                 <Stack
