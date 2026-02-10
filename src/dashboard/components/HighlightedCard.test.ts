@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  createWeekExportPayload,
-  getWeekExportFilename,
-  serializeWeekExport,
-} from "./HighlightedCard";
+import { getWeekExportFilename, serializeWeekExport } from "./HighlightedCard";
+import { createWeekExportPayload } from "../data/download/download";
 import type { FitnessWeek } from "../fitnessTypes";
 
 describe("HighlightedCard export helpers", () => {
